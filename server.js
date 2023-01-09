@@ -66,4 +66,5 @@ process.on('unhandledRejection', (err) => {
   });
 });
 
-console.log(x);
+// testing errors
+// console.log(x);
