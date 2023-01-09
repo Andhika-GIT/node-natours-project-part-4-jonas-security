@@ -1,10 +1,14 @@
 const express = require('express');
+const authController = require('../controllers/authController');
 
 // import the controller
 const userController = require('../controllers/userController');
 
 // create mount routers
 const router = express.Router();
+
+// router for signup
+router.post('/signup', authController.signup);
 
 router
   .route('/')
