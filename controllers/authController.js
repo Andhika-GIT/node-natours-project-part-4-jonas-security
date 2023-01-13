@@ -22,7 +22,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     process.env.JWT_SECRET,
     // options : define when the token expired
     {
-      expiredIn: process.env.JWT_EXPIRED_IN,
+      expiresIn: process.env.JWT_EXPIRED_IN,
     }
   );
 
