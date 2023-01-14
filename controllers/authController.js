@@ -4,20 +4,13 @@ const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
-exports.signup = catchAsync(async (req, res, next) => {
-  const newUser = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    passwordConfirm: req.body.passwordConfirm,
-  });
+// jwt.sign(payload, secretOrPrivateKey, [options, callback])
 
-  // jwt.sign(payload, secretOrPrivateKey, [options, callback])
-
-  const token = jwt.sign(
+const signToken = (id) => {
+  return jwt.sign(
     // create payload that contains all data that we wanna store into token
     {
-      id: newUser._id,
+      id: id,
     },
     // secret code for the token (use the JWT_SECRET from config.env)
     process.env.JWT_SECRET,
@@ -26,6 +19,17 @@ exports.signup = catchAsync(async (req, res, next) => {
       expiresIn: process.env.JWT_EXPIRED_IN,
     }
   );
+};
+
+exports.signup = catchAsync(async (req, res, next) => {
+  const newUser = await User.create({
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password,
+    passwordConfirm: req.body.passwordConfirm,
+  });
+
+  const token = signToken(newUser._id);
 
   res.status(201).json({
     status: 'success',
@@ -61,7 +65,7 @@ exports.login = catchAsync(async (req, res, next) => {
   console.log(user);
 
   // 3.) if everthing ok, send token to client
-  const token = '';
+  const token = signToken(user._id);
   res.status(200).json({
     status: 'success',
     token,
