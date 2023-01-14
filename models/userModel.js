@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const bcryptjs = require('bcryptjs');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -49,13 +49,25 @@ userSchema.pre('save', async function (next) {
   // only run this middleware, if the password field is changed
 
   // run the hash to bcrypt password field
-  this.password = await bcryptjs.hash(this.password, 12);
+  this.password = await bcrypt.hash(this.password, 12);
 
   // delete the passwordConfirm field, because we don't want to save it into database
   this.passwordConfirm = undefined;
 
   next();
 });
+
+// instanced method to compare the request body password with the database password
+
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  // use bcrypt.compare to compare the encrypted request password with database password
+
+  return await bcrypt.compare(candidatePassword, userPassword);
+  // return true or false
+};
 
 // initiate the model
 const User = mongoose.model('User', userSchema);
