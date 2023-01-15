@@ -71,3 +71,28 @@ exports.login = catchAsync(async (req, res, next) => {
     token,
   });
 });
+
+exports.protect = catchAsync(async (req, res, next) => {
+  // 1.) get the token after logged in, and check if it's there
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    // Authorization : Bearer asdfasdfasasdfasdf -> take the second value after Bearer using split
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (!token) {
+    // send error if token doesn't exist
+    return next(new AppError('Please log in to get access', 401));
+  }
+
+  // 2.) verification token
+
+  // 3.) check if user still exists
+
+  // 4.) check if user changed password after the token was issued
+
+  next();
+});
