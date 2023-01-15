@@ -16,8 +16,6 @@ const app = express();
 // parses incoming JSON requests and puts the parsed data in req.body
 app.use(express.json());
 
-////// * TOP LEVEL CODE * //////
-
 // middleware
 
 // console.log(process.env.NODE_ENV);
@@ -26,7 +24,9 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-////////////////////////////////
+app.use((req, res, next) => {
+  console.log(req.headers);
+});
 
 // create middleware route definition
 app.use('/api/v1/tours', tourRouter);
