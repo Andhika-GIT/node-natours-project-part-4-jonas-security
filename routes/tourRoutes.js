@@ -1,5 +1,8 @@
 const express = require('express');
 
+// middleware to protect route
+const authController = require('./../controllers/authController');
+
 // import the controller
 const tourController = require('../controllers/tourController');
 
@@ -19,7 +22,7 @@ router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
 router
   .route('/')
   // get request
-  .get(tourController.getAllTours)
+  .get(authController.protect, tourController.getAllTours)
   // post request
   .post(tourController.createTour);
 
