@@ -35,8 +35,14 @@ const handleValidationError = (err) => {
   return new AppError(message, 400);
 };
 
-const handleJWTError = (err) => {
+// function for handling false jwt signature
+const handleJWTError = () => {
   return new AppError('Invalid Token. Please log in again!', 401);
+};
+
+// function for handling token expired
+const handleJWTExpiredError = () => {
+  return new AppError('Your session has expired!, please login again', 401);
 };
 
 const sendError = (err, res, mode) => {
@@ -103,8 +109,13 @@ module.exports = (err, req, res, next) => {
 
     // if the err.name property value is "JsonWebTokenError"
     if (error.name === 'JsonWebTokenError') {
-      // run the handleValidationError and insert the result into error varibel
-      error = handleJWTError(error);
+      // run the handleJWTError
+      error = handleJWTError();
+    }
+    // if the err.name property value is "TokenExpiredError"
+    if (error.name === 'TokenExpiredError') {
+      // run the handleJWTExpiredError
+      error = handleJWTExpiredError();
     }
 
     sendError(error, res, 'production');
