@@ -35,6 +35,10 @@ const handleValidationError = (err) => {
   return new AppError(message, 400);
 };
 
+const handleJWTError = (err) => {
+  return new AppError('Invalid Token. Please log in again!', 401);
+};
+
 const sendError = (err, res, mode) => {
   //   if the mode is development send detail error
   if (mode === 'development') {
@@ -95,6 +99,12 @@ module.exports = (err, req, res, next) => {
     if (error.name === 'ValidationError') {
       // run the handleValidationError and insert the result into error varibel
       error = handleValidationError(error);
+    }
+
+    // if the err.name property value is "JsonWebTokenError"
+    if (error.name === 'JsonWebTokenError') {
+      // run the handleValidationError and insert the result into error varibel
+      error = handleJWTError(error);
     }
 
     sendError(error, res, 'production');
