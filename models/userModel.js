@@ -76,8 +76,23 @@ userSchema.methods.changedPasswordAfter = function (JWTTimeStamp) {
   if (this.passwordChangedAt) {
     // if the passwordChangedAt property exist, it means the user has changed their password
 
-    console.log(this.passwordChangedAt, JWTTimeStamp);
+    // change the passwordChangedAt field value time to miliseconds
+    // using parseInt() to parse string into integer value
+    // by using getTime() and divide it by 1000
+    // add 10 after, to convert the result into 10 base number
+    const changedTimeStamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+
+    console.log(changedTimeStamp, JWTTimeStamp);
+
+    // return true, if the created token date is less than password changed date
+    return JWTTimeStamp < changedTimeStamp;
   }
+
+  // other than that, if the passwordChangedAt property not exist yet, it means the user hasn't changed their password
+  return false;
 };
 
 // initiate the model
