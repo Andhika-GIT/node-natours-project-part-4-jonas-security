@@ -39,6 +39,9 @@ const userSchema = new mongoose.Schema({
       message: 'password is not matched',
     },
   },
+  passwordChangedAt: {
+    type: Date,
+  },
 });
 
 // pre-save middleware to encrypt password before it saves to database
@@ -58,7 +61,6 @@ userSchema.pre('save', async function (next) {
 });
 
 // instanced method to compare the request body password with the database password
-
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
@@ -67,6 +69,15 @@ userSchema.methods.correctPassword = async function (
 
   return await bcrypt.compare(candidatePassword, userPassword);
   // return true or false
+};
+
+// instanced method, to check if the user has changed their password or not
+userSchema.methods.changedPasswordAfter = function (JWTTimeStamp) {
+  if (this.passwordChangedAt) {
+    // if the passwordChangedAt property exist, it means the user has changed their password
+
+    console.log(this.passwordChangedAt, JWTTimeStamp);
+  }
 };
 
 // initiate the model
