@@ -27,6 +27,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
+    passwordChangedAt: req.body.passwordChangedAt,
   });
 
   const token = signToken(newUser._id);
@@ -105,6 +106,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   // 4.) check if user changed password after the token was issued
+  freshUser.changedPasswordAfter(decoded.iat);
 
   next();
 });
