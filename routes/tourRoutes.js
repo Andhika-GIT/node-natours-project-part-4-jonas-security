@@ -33,6 +33,6 @@ router
   // patch request
   .patch(tourController.updateTour)
   // delete request
-  .delete(tourController.deleteTour);
+  .delete(authController.protect, tourController.deleteTour);
 
 module.exports = router;
