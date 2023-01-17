@@ -97,22 +97,24 @@ exports.protect = catchAsync(async (req, res, next) => {
   // 3.) check if user still exists
 
   // the decoded result from jwt.verify method contains the user unique id from database
-  const freshUser = await User.findById(decoded.id);
+  const currentUser = await User.findById(decoded.id);
 
-  if (!freshUser) {
-    // if freshuser didn't exist based on the decoded user id
+  if (!currentUser) {
+    // if currentuser didn't exist based on the decoded user id
     return next(
       new AppError('The user belonging to this token does no longer exist.')
     );
   }
 
   // 4.) check if user changed password after the token was issued
-  if (freshUser.changedPasswordAfter(decoded.iat)) {
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
     // if the created token date is less than password changed date, means the user has changed the password, after the token is created
     return next(
       new AppError('user recently changed password! please log in again', 401)
     );
   }
 
+  // GRANT ACCESS TO PROTECTED ROUTE
+  req.user = currentUser;
   next();
 });
