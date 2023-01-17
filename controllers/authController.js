@@ -118,3 +118,21 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = currentUser;
   next();
 });
+
+// create a wrapper function that returns middleware function
+// because middleware function can't receive argument
+exports.restrictTo = (...roles) => {
+  // return our real middleware function
+
+  // roles['admin', 'lead-guide'], role = 'user'
+  return (req, res, next) => {
+    // if the roles didn't include ['admin', 'lead-guide'], then  don't give the user permission to delete tour
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You do not have permission to perform this action', 403)
+      );
+    }
+
+    next();
+  };
+};
