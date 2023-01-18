@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
@@ -47,6 +48,8 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: {
     type: Date,
   },
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 });
 
 // pre-save middleware to encrypt password before it saves to database
@@ -98,6 +101,24 @@ userSchema.methods.changedPasswordAfter = function (JWTTimeStamp) {
 
   // other than that, if the passwordChangedAt property not exist yet, it means the user hasn't changed their password
   return false;
+};
+
+// instance method to create reset token when user reset their password
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  // hash / encrypted the reset token
+  // then save it into our db
+  this.passwordResetToken = crypto
+    .createHash('sh256')
+    .update(resetToken)
+    .digest('hex');
+
+  // set the token expires time = expires in 10 minutes
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  // send the real reset token (not the encrypted one)
+  return resetToken;
 };
 
 // initiate the model
