@@ -110,7 +110,7 @@ userSchema.methods.createPasswordResetToken = function () {
   // hash / encrypted the reset token
   // then save it into our db
   this.passwordResetToken = crypto
-    .createHash('sh256')
+    .createHash('sha256')
     .update(resetToken)
     .digest('hex');
 
