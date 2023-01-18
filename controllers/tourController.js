@@ -110,10 +110,8 @@ exports.deleteTour = catchAsync(async (req, res, next) => {
   // delete the tour based on the id
   const deletedTour = await Tour.findByIdAndDelete(req.params.id);
 
-  // check if there's no tour
-  if (!tour) {
-    // add 404 page not found using our appError reusable error handling class
-    return next(new AppError('no tour found with that ID', 404));
+  if (!deletedTour) {
+    return next(new AppError('No tour found with that ID', 404));
   }
 
   // we can still return or send the deleted data as respond to client
