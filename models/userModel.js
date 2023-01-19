@@ -68,6 +68,16 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+// pre-save middleware to save or update the passwordChangedAt field
+userSchema.pre('save', function (next) {
+  // if the password field is not modified or newly created, then exit this pre-save middleware
+  if (!this.isModified('password') || this.isNew) return next();
+
+  // substract to 1 seconds, to prevent the token is created before the changed password timestamp
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
 // instanced method to compare the request body password with the database password
 userSchema.methods.correctPassword = async function (
   candidatePassword,
