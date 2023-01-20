@@ -220,3 +220,28 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     token,
   });
 });
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  const { passwordCurrent, newPassword, newPasswordConfirm } = req.body;
+  // 1.) get user from collection
+
+  const user = await User.findById(req.user.id).select('+password');
+
+  // 2.) check if the current password that user sent is the same as the real user password in database
+  if (!(await user.correctPassword(passwordCurrent, user.password))) {
+    return next(new AppError('your current password is wrong', 401));
+  }
+  // 3.) if so, update password
+  user.password = newPassword;
+  user.passwordConfirm = newPasswordConfirm;
+
+  await user.save();
+
+  // 4.) log user in, re-generate new jwt-token
+  const token = signToken(user._id);
+
+  res.status(200).json({
+    status: 'successfully update password',
+    token,
+  });
+});
