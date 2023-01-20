@@ -23,6 +23,17 @@ const signToken = (id) => {
   );
 };
 
+// method for reseting token and sending success status
+const createSendToken = (user, statusCode, res, data) => {
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data,
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -33,15 +44,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     role: req.body.role,
   });
 
-  const token = signToken(newUser._id);
-
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createSendToken(newUser, 200, res, { ...newUser });
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -69,11 +72,7 @@ exports.login = catchAsync(async (req, res, next) => {
   console.log(user);
 
   // 3.) if everthing ok, send token to client
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -212,13 +211,9 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await user.save(); // save the changes to database
 
   // 3) update changedPasswordAt property for the user (use the pre-save middleware in userModel)
-  // 4.) log the user in, send the new JWT
-  const token = signToken(user._id);
 
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  // 4.) log the user in, send the new JWT
+  createSendToken(user, 200, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
@@ -238,10 +233,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // 4.) log user in, re-generate new jwt-token
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: 'successfully update password',
-    token,
-  });
+  createSendToken(user, 200, res);
 });
