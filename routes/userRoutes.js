@@ -23,6 +23,9 @@ router.patch(
 // update user
 router.patch('/updateMe', authController.protect, userController.updateMe);
 
+// delete user
+router.delete('/deleteMe', authController.protect, userController.deleteMe);
+
 router
   .route('/')
   .get(userController.getAllUsers)
