@@ -83,6 +83,12 @@ userSchema.pre('save', function (next) {
   next();
 });
 
+// pre-find middleware to hide all users that have false value for the active property
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: true });
+  next();
+});
+
 // instanced method to compare the request body password with the database password
 userSchema.methods.correctPassword = async function (
   candidatePassword,
