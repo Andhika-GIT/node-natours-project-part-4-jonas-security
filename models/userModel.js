@@ -85,7 +85,7 @@ userSchema.pre('save', function (next) {
 
 // pre-find middleware to hide all users that have false value for the active property
 userSchema.pre(/^find/, function (next) {
-  this.find({ active: true });
+  this.find({ active: { $ne: false } });
   next();
 });
 
