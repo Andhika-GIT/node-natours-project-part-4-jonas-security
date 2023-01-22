@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
 
 // import error handling class file
 const AppError = require('./utils/appError');
@@ -16,10 +17,6 @@ const app = express();
 // parses incoming JSON requests and puts the parsed data in req.body
 app.use(express.json());
 
-// middleware
-
-// console.log(process.env.NODE_ENV);
-
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
@@ -29,6 +26,15 @@ app.use((req, res, next) => {
   // console.log(req.headers);
   next();
 });
+
+// limit incoming request from same ip adress
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many request from this IP, please try again in an hour',
+});
+
+app.use('/api', limiter);
 
 // create middleware route definition
 app.use('/api/v1/tours', tourRouter);
