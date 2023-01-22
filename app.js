@@ -2,6 +2,8 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
 
 // import error handling class file
 const AppError = require('./utils/appError');
@@ -29,6 +31,12 @@ app.use('/api', limiter);
 
 // parses incoming JSON requests and puts the parsed data in req.body
 app.use(express.json({ limit: '50kb' }));
+
+// data sanitization againts Nosql query injection
+app.use(mongoSanitize());
+
+// data sanitization againts XSS
+app.use(xss());
 
 // use morgan when in development mode
 if (process.env.NODE_ENV === 'development') {
